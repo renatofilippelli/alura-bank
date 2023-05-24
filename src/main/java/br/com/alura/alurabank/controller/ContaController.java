@@ -1,5 +1,6 @@
 package br.com.alura.alurabank.controller;
 
+import br.com.alura.alurabank.controller.form.CorrentistaForm;
 import br.com.alura.alurabank.domain.ContaCorrente;
 import br.com.alura.alurabank.domain.Correntista;
 import br.com.alura.alurabank.domain.MovimentacaoConta;
@@ -18,6 +19,7 @@ public class ContaController {
 
     @Autowired
     private ContaCorrenteRepository contaCorrenteRepository;
+
     @GetMapping
     public String consultarSaldo(
             @RequestParam(name = "banco") Integer banco,
@@ -34,20 +36,23 @@ public class ContaController {
     }
     @PostMapping
     public ResponseEntity<ContaCorrente> criarConta(
-            @RequestBody Correntista correntista
+            @RequestBody CorrentistaForm correntistaForm
     ){
+
+        Correntista correntista = correntistaForm.toCorrentista();
         Integer banco = 111;
         Integer agencia = 222;
         Integer numero = new Random().nextInt(999999);
         ContaCorrente conta = new ContaCorrente(banco, agencia, numero, correntista);
         contaCorrenteRepository.salvar(conta);
+
         return ResponseEntity.status(HttpStatus.CREATED).body(conta);
     }
     @DeleteMapping
     public ResponseEntity<String> fecharConta(
             @RequestBody ContaCorrente conta
     ){
-       if(contaCorrenteRepository.fechar(conta)){
+        if(contaCorrenteRepository.fechar(conta)){
            return ResponseEntity.status(HttpStatus.OK)
                    .body("Conta encerrada com sucesso!");
        } else {
