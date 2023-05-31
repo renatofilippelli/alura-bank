@@ -20,7 +20,7 @@ public class ContaCorrente {
     @JsonProperty
     @EqualsAndHashCode.Exclude
     private BigDecimal saldo;
-    @JsonIgnore
+    @JsonProperty
     @EqualsAndHashCode.Exclude
     private Correntista correntista;
 

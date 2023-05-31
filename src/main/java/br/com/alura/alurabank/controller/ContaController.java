@@ -10,8 +10,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.ConstraintViolation;
+import javax.validation.Path;
+import javax.validation.Validation;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/conta")
@@ -35,9 +41,19 @@ public class ContaController {
                 , contaCorrente.getNumero(), contaCorrente.lerSaldo());
     }
     @PostMapping
-    public ResponseEntity<ContaCorrente> criarConta(
+    public ResponseEntity criarConta(
             @RequestBody CorrentistaForm correntistaForm
     ){
+        Set<ConstraintViolation<CorrentistaForm>> violations
+                = Validation.buildDefaultValidatorFactory().getValidator().validate(correntistaForm);
+
+        Map<Path, String> violationsToMap = violations.stream()
+                .collect(Collectors.toMap(
+                        v -> v.getPropertyPath(), v -> v.getMessage()));
+
+        if(!violationsToMap.isEmpty()){
+            return ResponseEntity.badRequest().body(violationsToMap);
+        }
 
         Correntista correntista = correntistaForm.toCorrentista();
         Integer banco = 111;
